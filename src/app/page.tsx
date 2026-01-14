@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 function Logo() {
   return (
@@ -43,19 +43,46 @@ function Logo() {
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user, login } = useAuth();
+  const { user, login, isLoading } = useAuth();
+  const [email, setEmail] = useState('demo@user.com');
+  const [password, setPassword] = useState('password');
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    if (user) {
+    if (!isLoading && user) {
       router.push('/dashboard');
     }
-  }, [user, router]);
+  }, [user, isLoading, router]);
+
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    login({ email: 'demo@user.com' });
+    setError('');
+
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
+    login({ email: email });
     router.push('/dashboard');
   };
+
+  if (isLoading || user) {
+    return (
+        <div className="flex h-screen items-center justify-center">
+            <p>Loading...</p>
+        </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
@@ -73,6 +100,7 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="grid gap-4">
+            {error && <p className="text-destructive text-sm text-center">{error}</p>}
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -80,7 +108,8 @@ export default function LoginPage() {
                 type="email"
                 placeholder="m@example.com"
                 required
-                defaultValue="demo@user.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
@@ -93,7 +122,13 @@ export default function LoginPage() {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" type="password" required defaultValue="password" />
+              <Input 
+                id="password" 
+                type="password" 
+                required 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
             <Button type="submit" className="w-full">
               Login

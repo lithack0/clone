@@ -69,21 +69,21 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const [open, setOpen] = React.useState(true);
 
   React.useEffect(() => {
-    if (!user) {
+    if (!isLoading && !user) {
       router.push('/');
     }
-  }, [user, router]);
+  }, [user, isLoading, router]);
 
   const handleLogout = () => {
     logout();
     router.push('/');
   };
 
-  if (!user) {
+  if (isLoading || !user) {
     return (
       <div className="flex h-screen items-center justify-center">
         <p>Loading...</p>

@@ -17,6 +17,7 @@ interface ClonesContextType {
     credential: Omit<Credential, 'id' | 'createdAt'>
   ) => void;
   deleteClone: (cloneId: string) => void;
+  isLoaded: boolean;
 }
 
 const ClonesContext = createContext<ClonesContextType | undefined>(undefined);
@@ -87,7 +88,7 @@ export function ClonesProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ClonesContext.Provider value={{ clones, addClone, addCredential, deleteClone }}>
+    <ClonesContext.Provider value={{ clones, addClone, addCredential, deleteClone, isLoaded }}>
       {children}
     </ClonesContext.Provider>
   );

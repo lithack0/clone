@@ -9,12 +9,12 @@ import InstagramPage from '@/components/clones/InstagramPage';
 export default function ClonePage() {
   const params = useParams();
   const { slug } = params;
-  const { clones } = useClones();
+  const { clones, isLoaded } = useClones();
 
   const cloneId = Array.isArray(slug) ? slug[0] : slug;
   const currentClone = clones.find((c) => c.id === cloneId);
 
-  if (!clones || clones.length === 0) {
+  if (!isLoaded) {
      return (
         <div className="flex h-screen items-center justify-center bg-gray-100">
             <p>Loading clone...</p>

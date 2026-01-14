@@ -6,7 +6,15 @@ import Link from 'next/link';
 import { PlusCircle } from 'lucide-react';
 
 export default function DashboardPage() {
-  const { clones } = useClones();
+  const { clones, isLoaded } = useClones();
+
+  if (!isLoaded) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p>Loading clones...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-6">
