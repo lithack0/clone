@@ -23,35 +23,35 @@ export default function LinkedinPage({ clone }: { clone: Clone }) {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col items-center pt-12 font-sans">
-       <div className="mb-6">
+    <div className="bg-gray-100 min-h-screen flex flex-col items-center pt-12 font-sans text-gray-900">
+       <div className="mb-6 w-full max-w-sm px-4">
         <LinkedInLogo />
        </div>
        <div className="w-full max-w-sm">
          <div className="bg-white p-8 rounded-lg shadow-md">
             <h1 className="text-3xl font-semibold mb-2">Sign in</h1>
             <p className="text-gray-600 mb-6">Stay updated on your professional world</p>
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                <input
-                    type="text"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email or Phone"
-                    className="w-full px-4 py-3 border border-gray-700 rounded-md focus:outline-none focus:ring-1 focus:ring-black"
-                    required
-                />
+                  <label className="text-sm text-gray-700 block mb-1 font-medium">Email or Phone</label>
+                  <input
+                      type="text"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-1 focus:ring-black"
+                      required
+                  />
                 </div>
                 <div>
-                <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                    className="w-full px-4 py-3 border border-gray-700 rounded-md focus:outline-none focus:ring-1 focus:ring-black"
-                />
+                  <label className="text-sm text-gray-700 block mb-1 font-medium">Password</label>
+                  <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-1 focus:ring-black"
+                  />
                 </div>
-                 <a href="#" className="text-sm text-[#0a66c2] font-semibold hover:underline">
+                 <a href="#" className="text-sm text-[#0a66c2] font-semibold hover:underline block pt-2">
                     Forgot password?
                 </a>
                 <button
