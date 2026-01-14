@@ -91,7 +91,7 @@ export default function DashboardLayout({
   const getPageTitle = () => {
     if (pathname === '/dashboard') return 'Dashboard';
     if (pathname === '/dashboard/new') return 'Create New Clone';
-    return 'SocialVerse Cloner';
+    return 'PhishVerse';
   };
 
   return (
@@ -102,7 +102,7 @@ export default function DashboardLayout({
             <div className="flex items-center gap-3">
               <Logo />
               <h1 className="text-xl font-headline font-semibold text-primary-foreground">
-                SocialVerse
+                PhishVerse
               </h1>
             </div>
           </SidebarHeader>

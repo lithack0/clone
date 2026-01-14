@@ -65,7 +65,7 @@ export default function LoginPage() {
             <Logo />
           </div>
           <CardTitle className="text-2xl font-headline text-center">
-            SocialVerse Cloner
+            PhishVerse
           </CardTitle>
           <CardDescription className="text-center">
             Enter your credentials to access your dashboard
