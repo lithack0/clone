@@ -1,5 +1,5 @@
 'use client';
-
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -19,7 +19,9 @@ import { Camera } from 'lucide-react';
 
 export default function SettingsPage() {
   const { toast } = useToast();
-  const userAvatar = PlaceHolderImages.find(img => img.id === 'user-avatar');
+  const defaultAvatar = PlaceHolderImages.find(img => img.id === 'user-avatar');
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(defaultAvatar?.imageUrl || null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,15 +29,34 @@ export default function SettingsPage() {
       title: 'Settings Saved',
       description: 'Your profile information has been updated.',
     });
+    // Here you would also handle uploading the new avatar file if one was selected
   };
 
   const handleImageUploadClick = () => {
-    // In a real app, this would trigger a file input.
-    // For now, we'll show a toast.
-    toast({
-      title: "Feature in development",
-      description: "Profile picture uploads are coming soon!",
-    });
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setAvatarPreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+        toast({
+          title: 'Image Selected',
+          description: 'Click "Save Changes" to apply your new profile picture.',
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Invalid File Type',
+          description: 'Please select an image file.',
+        });
+      }
+    }
   };
 
   return (
@@ -52,26 +73,34 @@ export default function SettingsPage() {
             <div className="space-y-2 flex flex-col items-center">
               <Label htmlFor="profile-picture">Profile Picture</Label>
               <div className="relative group">
-                <Avatar className="w-32 h-32">
-                  {userAvatar && (
-                    <AvatarImage
-                      src={userAvatar.imageUrl}
-                      alt="User avatar"
-                      data-ai-hint={userAvatar.imageHint}
-                    />
-                  )}
-                  <AvatarFallback>U</AvatarFallback>
-                </Avatar>
-                <Button
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                  accept="image/*"
+                  id="profile-picture-input"
+                />
+                <button
                   type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute inset-0 w-full h-full bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
                   onClick={handleImageUploadClick}
+                  className="relative rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 >
-                  <Camera className="w-8 h-8" />
-                  <span className="sr-only">Upload new picture</span>
-                </Button>
+                  <Avatar className="w-32 h-32">
+                    {avatarPreview && (
+                      <AvatarImage
+                        src={avatarPreview}
+                        alt="User avatar"
+                        data-ai-hint={defaultAvatar?.imageHint}
+                      />
+                    )}
+                    <AvatarFallback>U</AvatarFallback>
+                  </Avatar>
+                  <div className="absolute inset-0 w-full h-full bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                    <Camera className="w-8 h-8" />
+                    <span className="sr-only">Upload new picture</span>
+                  </div>
+                </button>
               </div>
             </div>
             <div className="space-y-2">
