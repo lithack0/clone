@@ -36,7 +36,7 @@ import { usePathname } from 'next/navigation';
 import React from 'react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-const userAvatar = PlaceHolderImages.find(img => img.id === 'user-avatar');
+const defaultUserAvatar = PlaceHolderImages.find(img => img.id === 'user-avatar');
 
 function Logo() {
   return (
@@ -101,12 +101,14 @@ export default function DashboardLayout({
     return 'PhishVerse';
   };
 
+  const userAvatarUrl = user?.avatarUrl || defaultUserAvatar?.imageUrl;
+
   return (
     <SidebarProvider defaultOpen>
       <div className="flex min-h-screen">
         <Sidebar>
           <SidebarHeader className="p-4">
-            <Link href="/" className="flex items-center gap-3 phishverse-logo-glow">
+            <Link href="/dashboard" className="flex items-center gap-3 phishverse-logo-glow">
               <Logo />
               <h1 className="text-xl font-headline font-semibold text-primary-foreground">
                 PhishVerse
@@ -158,11 +160,11 @@ export default function DashboardLayout({
                     className="overflow-hidden rounded-full"
                   >
                     <Avatar>
-                      {userAvatar && (
+                      {userAvatarUrl && (
                         <AvatarImage
-                          src={userAvatar.imageUrl}
+                          src={userAvatarUrl}
                           alt="User avatar"
-                          data-ai-hint={userAvatar.imageHint}
+                          data-ai-hint={defaultUserAvatar?.imageHint}
                         />
                       )}
                       <AvatarFallback>U</AvatarFallback>

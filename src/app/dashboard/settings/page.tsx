@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -16,20 +16,30 @@ import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Camera } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function SettingsPage() {
   const { toast } = useToast();
+  const { user, updateUser } = useAuth();
   const defaultAvatar = PlaceHolderImages.find(img => img.id === 'user-avatar');
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(defaultAvatar?.imageUrl || null);
+  
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setAvatarPreview(user?.avatarUrl || defaultAvatar?.imageUrl || null);
+  }, [user, defaultAvatar]);
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (avatarPreview && avatarPreview !== (user?.avatarUrl || defaultAvatar?.imageUrl)) {
+        updateUser({ avatarUrl: avatarPreview });
+    }
     toast({
       title: 'Settings Saved',
       description: 'Your profile information has been updated.',
     });
-    // Here you would also handle uploading the new avatar file if one was selected
   };
 
   const handleImageUploadClick = () => {
@@ -46,7 +56,7 @@ export default function SettingsPage() {
         };
         reader.readAsDataURL(file);
         toast({
-          title: 'Image Selected',
+          title: 'Image Ready',
           description: 'Click "Save Changes" to apply your new profile picture.',
         });
       } else {
@@ -109,7 +119,7 @@ export default function SettingsPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="Enter your email" defaultValue="demo@user.com" disabled />
+              <Input id="email" type="email" placeholder="Enter your email" defaultValue={user?.email || "demo@user.com"} disabled />
             </div>
             <div className="space-y-2">
               <Label htmlFor="bio">About</Label>
