@@ -106,7 +106,7 @@ export default function DashboardLayout({
       <div className="flex min-h-screen">
         <Sidebar>
           <SidebarHeader className="p-4">
-            <Link href="/" className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3 phishverse-logo-glow">
               <Logo />
               <h1 className="text-xl font-headline font-semibold text-primary-foreground">
                 PhishVerse

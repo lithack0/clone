@@ -87,3 +87,15 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .phishverse-logo-glow {
+    @apply transition-all;
+  }
+  .phishverse-logo-glow:hover {
+    text-shadow: 0 0 10px hsl(var(--primary)), 0 0 20px hsl(var(--primary));
+  }
+  .phishverse-logo-glow:hover svg {
+    filter: drop-shadow(0 0 5px hsl(var(--primary)));
+  }
+}

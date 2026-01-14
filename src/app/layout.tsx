@@ -28,10 +28,13 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="font-body antialiased">
+      <body className="font-body antialiased flex flex-col min-h-screen">
         <AuthProvider>
           <ClonesProvider>
-            {children}
+            <div className="flex-grow">{children}</div>
+            <footer className="w-full py-4 text-center text-xs text-muted-foreground">
+              Made with love by 117h4ck for my Students
+            </footer>
             <Toaster />
           </ClonesProvider>
         </AuthProvider>
