@@ -1,8 +1,7 @@
 'use client';
-
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
+
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -13,7 +12,6 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useEffect } from 'react';
 
 function Logo() {
   return (
@@ -41,19 +39,13 @@ function Logo() {
   );
 }
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
-  const { user, login } = useAuth();
 
-  useEffect(() => {
-    if (user) {
-      router.push('/dashboard');
-    }
-  }, [user, router]);
-
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
-    login({ email: 'demo@user.com' });
+    // In a real app, this would call a signup function.
+    // For now, just redirect to dashboard.
     router.push('/dashboard');
   };
 
@@ -65,14 +57,22 @@ export default function LoginPage() {
             <Logo />
           </div>
           <CardTitle className="text-2xl font-headline text-center">
-            SocialVerse Cloner
+            Create an Account
           </CardTitle>
           <CardDescription className="text-center">
-            Enter your credentials to access your dashboard
+            Enter your information to get started
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="grid gap-4">
+          <form onSubmit={handleSignup} className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="first-name">First name</Label>
+              <Input id="first-name" placeholder="Max" required />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="last-name">Last name</Label>
+              <Input id="last-name" placeholder="Robinson" required />
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -80,29 +80,20 @@ export default function LoginPage() {
                 type="email"
                 placeholder="m@example.com"
                 required
-                defaultValue="demo@user.com"
               />
             </div>
             <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-                <Link
-                  href="#"
-                  className="ml-auto inline-block text-sm underline"
-                >
-                  Forgot your password?
-                </Link>
-              </div>
-              <Input id="password" type="password" required defaultValue="password" />
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" type="password" />
             </div>
             <Button type="submit" className="w-full">
-              Login
+              Create an account
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="underline">
-              Sign up
+            Already have an account?{' '}
+            <Link href="/" className="underline">
+              Sign in
             </Link>
           </div>
         </CardContent>
