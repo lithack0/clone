@@ -1,3 +1,10 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "user-avatar",
+      "description": "A hacker in a dark room with multiple monitors.",
+      "imageUrl": "https://storage.googleapis.com/fab-dev-images/d8c1306d-a51c-43a9-8367-e3568b6b0c20.png",
+      "imageHint": "hacker programmer"
+    }
+  ]
 }

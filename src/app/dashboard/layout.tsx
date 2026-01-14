@@ -32,6 +32,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { usePathname } from 'next/navigation';
 import React from 'react';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+
+const userAvatar = PlaceHolderImages.find(img => img.id === 'user-avatar');
 
 function Logo() {
   return (
@@ -151,10 +154,13 @@ export default function DashboardLayout({
                     className="overflow-hidden rounded-full"
                   >
                     <Avatar>
-                      <AvatarImage
-                        src="https://picsum.photos/seed/user/32/32"
-                        alt="User avatar"
-                      />
+                      {userAvatar && (
+                        <AvatarImage
+                          src={userAvatar.imageUrl}
+                          alt="User avatar"
+                          data-ai-hint={userAvatar.imageHint}
+                        />
+                      )}
                       <AvatarFallback>U</AvatarFallback>
                     </Avatar>
                   </Button>
