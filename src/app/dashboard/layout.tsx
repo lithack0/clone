@@ -8,6 +8,8 @@ import {
   LogOut,
   Home,
   PanelLeft,
+  Settings,
+  LifeBuoy,
 } from 'lucide-react';
 import {
   SidebarProvider,
@@ -94,6 +96,8 @@ export default function DashboardLayout({
   const getPageTitle = () => {
     if (pathname === '/dashboard') return 'Dashboard';
     if (pathname === '/dashboard/new') return 'Create New Clone';
+    if (pathname === '/dashboard/settings') return 'Settings';
+    if (pathname === '/dashboard/support') return 'Support';
     return 'PhishVerse';
   };
 
@@ -102,12 +106,12 @@ export default function DashboardLayout({
       <div className="flex min-h-screen">
         <Sidebar>
           <SidebarHeader className="p-4">
-            <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3">
               <Logo />
               <h1 className="text-xl font-headline font-semibold text-primary-foreground">
                 PhishVerse
               </h1>
-            </div>
+            </Link>
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
@@ -168,10 +172,23 @@ export default function DashboardLayout({
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
-                  <DropdownMenuItem>Support</DropdownMenuItem>
+                  <Link href="/dashboard/settings" passHref>
+                    <DropdownMenuItem>
+                      <Settings className="mr-2 h-4 w-4" />
+                      Settings
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/dashboard/support" passHref>
+                    <DropdownMenuItem>
+                      <LifeBuoy className="mr-2 h-4 w-4" />
+                      Support
+                    </DropdownMenuItem>
+                  </Link>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
