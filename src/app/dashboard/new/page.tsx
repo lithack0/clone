@@ -1,41 +1,41 @@
-'use client';
-import { useRouter } from 'next/navigation';
-import { useClones } from '@/hooks/use-clones';
-import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
+"use client";
+import { useRouter } from "next/navigation";
+import { useClones } from "@/hooks/use-clones";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
-import type { Platform } from '@/lib/types';
+} from "@/components/ui/card";
+import { Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
+import type { Platform } from "@/lib/types";
 
 const platforms = [
   {
-    name: 'Facebook',
-    id: 'facebook',
+    name: "Facebook",
+    id: "facebook",
     icon: <Facebook className="h-8 w-8" />,
-    style: 'text-blue-600',
+    style: "text-blue-600",
   },
   {
-    name: 'Twitter',
-    id: 'twitter',
+    name: "Twitter",
+    id: "twitter",
     icon: <Twitter className="h-8 w-8" />,
-    style: 'text-sky-500',
+    style: "text-sky-500",
   },
   {
-    name: 'LinkedIn',
-    id: 'linkedin',
+    name: "LinkedIn",
+    id: "linkedin",
     icon: <Linkedin className="h-8 w-8" />,
-    style: 'text-blue-800',
+    style: "text-blue-800",
   },
   {
-    name: 'Instagram',
-    id: 'instagram',
+    name: "Instagram",
+    id: "instagram",
     icon: <Instagram className="h-8 w-8" />,
-    style: 'text-pink-500',
+    style: "text-pink-500",
   },
 ] as const;
 
@@ -44,13 +44,23 @@ export default function NewClonePage() {
   const { addClone } = useClones();
   const { toast } = useToast();
 
-  const handleCreateClone = (platform: Platform) => {
-    addClone(platform);
-    toast({
-      title: 'Clone Created!',
-      description: `A new ${platform.charAt(0).toUpperCase() + platform.slice(1)} clone has been added to your dashboard.`,
-    });
-    router.push('/dashboard');
+  const handleCreateClone = async (platform: Platform) => {
+    try {
+      const newClone = await addClone(platform);
+      toast({
+        title: "Clone Created!",
+        description: `A new ${
+          platform.charAt(0).toUpperCase() + platform.slice(1)
+        } clone has been added to your dashboard.`,
+      });
+      router.push(newClone.url);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create clone.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

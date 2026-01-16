@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, {
   createContext,
@@ -6,17 +6,29 @@ import React, {
   useState,
   ReactNode,
   useEffect,
-} from 'react';
-import type { Clone, Credential, Platform } from '@/lib/types';
+} from "react";
+import { db } from "@/lib/firebase";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  addDoc,
+  updateDoc,
+  doc,
+  deleteDoc,
+} from "firebase/firestore";
+import { useAuth } from "@/hooks/use-auth";
+import type { Clone, Credential, Platform } from "@/lib/types";
 
 interface ClonesContextType {
   clones: Clone[];
-  addClone: (platform: Platform) => Clone;
+  addClone: (platform: Platform) => Promise<Clone>;
   addCredential: (
     cloneId: string,
-    credential: Omit<Credential, 'id' | 'createdAt'>
-  ) => void;
-  deleteClone: (cloneId: string) => void;
+    credential: Omit<Credential, "id" | "createdAt">
+  ) => Promise<void>;
+  deleteClone: (cloneId: string) => Promise<void>;
   isLoaded: boolean;
 }
 
@@ -25,45 +37,51 @@ const ClonesContext = createContext<ClonesContextType | undefined>(undefined);
 export function ClonesProvider({ children }: { children: ReactNode }) {
   const [clones, setClones] = useState<Clone[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
-    try {
-      const item = window.localStorage.getItem('clones');
-      if (item) {
-        setClones(JSON.parse(item));
-      }
-    } catch (error) {
-      console.error('Failed to load clones from localStorage', error);
+    if (!user) {
+      setClones([]);
+      setIsLoaded(true);
+      return;
     }
-    setIsLoaded(true);
-  }, []);
 
-  useEffect(() => {
-    if (isLoaded) {
-      try {
-        window.localStorage.setItem('clones', JSON.stringify(clones));
-      } catch (error) {
-        console.error('Failed to save clones to localStorage', error);
-      }
-    }
-  }, [clones, isLoaded]);
+    const q = query(
+      collection(db, "clones"),
+      where("userId", "==", user.email)
+    );
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const clonesData: Clone[] = [];
+      querySnapshot.forEach((doc) => {
+        clonesData.push({ id: doc.id, ...doc.data() } as Clone);
+      });
+      setClones(clonesData);
+      setIsLoaded(true);
+    });
 
-  const addClone = (platform: Platform) => {
-    const id = `${platform}-${Math.random().toString(36).substr(2, 9)}`;
-    const newClone: Clone = {
-      id,
+    return () => unsubscribe();
+  }, [user]);
+
+  const addClone = async (platform: Platform) => {
+    if (!user) throw new Error("User not authenticated");
+
+    const newClone: Omit<Clone, "id"> = {
+      userId: user.email!,
       platform,
-      url: `/c/${id}`,
+      url: "", // will set after
       createdAt: new Date().toISOString(),
       credentials: [],
     };
-    setClones((prevClones) => [newClone, ...prevClones]);
-    return newClone;
+
+    const docRef = await addDoc(collection(db, "clones"), newClone);
+    const clone: Clone = { id: docRef.id, ...newClone, url: `/c/${docRef.id}` };
+    await updateDoc(docRef, { url: `/c/${docRef.id}` });
+    return clone;
   };
 
-  const addCredential = (
+  const addCredential = async (
     cloneId: string,
-    credentialData: Omit<Credential, 'id' | 'createdAt'>
+    credentialData: Omit<Credential, "id" | "createdAt">
   ) => {
     const newCredential: Credential = {
       ...credentialData,
@@ -71,24 +89,23 @@ export function ClonesProvider({ children }: { children: ReactNode }) {
       createdAt: new Date().toISOString(),
     };
 
-    setClones((prevClones) =>
-      prevClones.map((clone) =>
-        clone.id === cloneId
-          ? {
-              ...clone,
-              credentials: [newCredential, ...clone.credentials],
-            }
-          : clone
-      )
-    );
+    const cloneRef = doc(db, "clones", cloneId);
+    const clone = clones.find((c) => c.id === cloneId);
+    if (clone) {
+      await updateDoc(cloneRef, {
+        credentials: [newCredential, ...clone.credentials],
+      });
+    }
   };
-  
-  const deleteClone = (cloneId: string) => {
-    setClones((prevClones) => prevClones.filter(clone => clone.id !== cloneId));
+
+  const deleteClone = async (cloneId: string) => {
+    await deleteDoc(doc(db, "clones", cloneId));
   };
 
   return (
-    <ClonesContext.Provider value={{ clones, addClone, addCredential, deleteClone, isLoaded }}>
+    <ClonesContext.Provider
+      value={{ clones, addClone, addCredential, deleteClone, isLoaded }}
+    >
       {children}
     </ClonesContext.Provider>
   );
@@ -97,7 +114,7 @@ export function ClonesProvider({ children }: { children: ReactNode }) {
 export function useClones() {
   const context = useContext(ClonesContext);
   if (context === undefined) {
-    throw new Error('useClones must be used within a ClonesProvider');
+    throw new Error("useClones must be used within a ClonesProvider");
   }
   return context;
 }

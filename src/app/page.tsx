@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
-import { Button } from '@/components/ui/button';
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useEffect, useState } from 'react';
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useEffect, useState } from "react";
 
 function Logo() {
   return (
@@ -44,13 +44,13 @@ function Logo() {
 export default function LoginPage() {
   const router = useRouter();
   const { user, login, isLoading } = useAuth();
-  const [email, setEmail] = useState('demo@user.com');
-  const [password, setPassword] = useState('password');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("demo@user.com");
+  const [password, setPassword] = useState("password");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!isLoading && user) {
-      router.push('/dashboard');
+      router.push("/dashboard");
     }
   }, [user, isLoading, router]);
 
@@ -59,28 +59,32 @@ export default function LoginPage() {
     return re.test(String(email).toLowerCase());
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!validateEmail(email)) {
-      setError('Please enter a valid email address.');
+      setError("Please enter a valid email address.");
       return;
     }
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long.');
+      setError("Password must be at least 6 characters long.");
       return;
     }
 
-    login({ email: email });
-    router.push('/dashboard');
+    try {
+      await login(email, password);
+      router.push("/dashboard");
+    } catch (err: any) {
+      setError(err.message);
+    }
   };
 
   if (isLoading || user) {
     return (
-        <div className="flex h-screen items-center justify-center">
-            <p>Loading...</p>
-        </div>
+      <div className="flex h-screen items-center justify-center">
+        <p>Loading...</p>
+      </div>
     );
   }
 
@@ -100,7 +104,9 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="grid gap-4">
-            {error && <p className="text-destructive text-sm text-center">{error}</p>}
+            {error && (
+              <p className="text-destructive text-sm text-center">{error}</p>
+            )}
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -122,10 +128,10 @@ export default function LoginPage() {
                   Forgot your password?
                 </Link>
               </div>
-              <Input 
-                id="password" 
-                type="password" 
-                required 
+              <Input
+                id="password"
+                type="password"
+                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -135,7 +141,7 @@ export default function LoginPage() {
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
+            Don&apos;t have an account?{" "}
             <Link href="/signup" className="underline link-glow-on-hover">
               Sign up
             </Link>

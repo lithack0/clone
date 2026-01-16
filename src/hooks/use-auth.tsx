@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, {
   createContext,
@@ -6,7 +6,15 @@ import React, {
   useState,
   ReactNode,
   useEffect,
-} from 'react';
+} from "react";
+import { auth } from "@/lib/firebase";
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  User as FirebaseUser,
+} from "firebase/auth";
 
 interface User {
   email: string;
@@ -15,8 +23,9 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (user: Omit<User, 'avatarUrl'>) => void;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
   isLoading: boolean;
 }
@@ -28,52 +37,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const item = window.localStorage.getItem('user');
-      if (item) {
-        setUser(JSON.parse(item));
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (firebaseUser: FirebaseUser | null) => {
+        if (firebaseUser) {
+          setUser({
+            email: firebaseUser.email!,
+            avatarUrl: firebaseUser.photoURL || undefined,
+          });
+        } else {
+          setUser(null);
+        }
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Failed to load user from localStorage', error);
-    } finally {
-      setIsLoading(false);
-    }
+    );
+
+    return () => unsubscribe();
   }, []);
 
-  const login = (userData: Omit<User, 'avatarUrl'>) => {
-    try {
-      const newUser = { ...user, ...userData };
-      window.localStorage.setItem('user', JSON.stringify(newUser));
-      setUser(newUser);
-    } catch (error) {
-      console.error('Failed to save user to localStorage', error);
-    }
+  const login = async (email: string, password: string) => {
+    await signInWithEmailAndPassword(auth, email, password);
   };
 
-  const logout = () => {
-    try {
-      window.localStorage.removeItem('user');
-      setUser(null);
-    } catch (error) {
-      console.error('Failed to remove user from localStorage', error);
-    }
+  const signup = async (email: string, password: string) => {
+    await createUserWithEmailAndPassword(auth, email, password);
+  };
+
+  const logout = async () => {
+    await signOut(auth);
   };
 
   const updateUser = (userData: Partial<User>) => {
-    setUser(currentUser => {
+    setUser((currentUser) => {
       if (!currentUser) return null;
-      const updatedUser = { ...currentUser, ...userData };
-      try {
-        window.localStorage.setItem('user', JSON.stringify(updatedUser));
-      } catch (error) {
-        console.error('Failed to update user in localStorage', error);
-      }
-      return updatedUser;
+      return { ...currentUser, ...userData };
     });
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, updateUser, isLoading }}>
+    <AuthContext.Provider
+      value={{ user, login, signup, logout, updateUser, isLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -82,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

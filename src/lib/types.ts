@@ -1,4 +1,4 @@
-export type Platform = 'facebook' | 'twitter' | 'linkedin' | 'instagram';
+export type Platform = "facebook" | "twitter" | "linkedin" | "instagram";
 
 export interface Credential {
   id: string;
@@ -9,6 +9,7 @@ export interface Credential {
 
 export interface Clone {
   id: string;
+  userId: string;
   platform: Platform;
   url: string;
   createdAt: string;
